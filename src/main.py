@@ -14,6 +14,7 @@ origins = [
 ]
 
 
+
 @app.on_event("startup")
 async def on_startup():
     await RedisClient.connect()
