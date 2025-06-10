@@ -1,9 +1,11 @@
 # Репозиторий для отправки email
-from src.application.interfaces.email_service import EmailService
-from aiosmtplib import SMTPException
-from email.mime.text import MIMEText
-from pydantic import EmailStr
 import logging
+from email.mime.text import MIMEText
+
+from aiosmtplib import SMTPException
+from pydantic import EmailStr
+
+from src.application.interfaces.email_service import EmailService
 from src.infrastructure.email.email_client_manager import SMTPClientManager
 
 logger = logging.getLogger(__name__)

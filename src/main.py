@@ -1,9 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from src.infrastructure.redis.redis_client_manager import RedisClient
+
 from src.infrastructure.api.v1.routes.auth import router as auth_router
 from src.infrastructure.email.email_client_manager import EmailClietn
-from src.config import settings
+from src.infrastructure.redis.redis_client_manager import RedisClient
 
 app = FastAPI()
 app.include_router(auth_router)
@@ -12,7 +12,6 @@ origins = [
     "http://localhost:5173",
     "http://127.0.0.1:3000",
 ]
-
 
 
 @app.on_event("startup")

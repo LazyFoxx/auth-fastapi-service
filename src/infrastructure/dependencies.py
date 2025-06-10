@@ -1,27 +1,31 @@
-from typing import AsyncGenerator, Annotated
-from fastapi import Depends, FastAPI
-from sqlalchemy.ext.asyncio import AsyncSession
-from redis.asyncio import Redis
-from src.infrastructure.database.database import async_session_maker
-from src.application.interfaces.email_service import EmailService
-from src.application.interfaces.user_repository import UserRepository
-from src.application.interfaces.user_cache_repository import UserCacheRepository
-from src.application.use_cases.user_service import UserService
-from src.application.interfaces.token_service import TokenService
-from src.application.interfaces.password_hasher_repository import PasswordHasher
-from src.infrastructure.email.email_client_manager import SMTPClientManager
-from src.infrastructure.email.repositories.user_email_repository_impl import EmailServiceImpl
+from typing import Annotated, AsyncGenerator
 
+from fastapi import Depends
+from redis.asyncio import Redis
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from src.application.interfaces.email_service import EmailService
+from src.application.interfaces.password_hasher_repository import PasswordHasher
+from src.application.interfaces.token_service import TokenService
+from src.application.interfaces.user_cache_repository import UserCacheRepository
+from src.application.interfaces.user_repository import UserRepository
+from src.application.use_cases.user_service import UserService
+from src.config import settings
+from src.infrastructure.database.database import async_session_maker
 from src.infrastructure.database.repositories.user_repository_impl import (
     UserRepositoryImpl,
 )
+from src.infrastructure.email.email_client_manager import SMTPClientManager
+from src.infrastructure.email.repositories.user_email_repository_impl import (
+    EmailServiceImpl,
+)
+from src.infrastructure.redis.redis_client_manager import RedisClient
 from src.infrastructure.redis.repositories.user_redis_repository_impl import (
     UserRedisRepositoryImpl,
 )
-from src.infrastructure.token_service_impl import TokenServiceImpl
-from src.infrastructure.redis.redis_client_manager import RedisClient
 from src.infrastructure.secure import PasswordHasherImpl
-from src.config import settings
+from src.infrastructure.token_service_impl import TokenServiceImpl
+
 
 async def get_async_db() -> AsyncGenerator:
     """Зависимость FastAPI для получения асинхронной сессии БД."""
@@ -33,13 +37,15 @@ async def get_redis() -> Redis:
     """Зависимость для получения клиента Redis."""
     return await RedisClient.get_client()
 
+
 async def get_smtp() -> SMTPClientManager:
     """Зависимость для получения менеджера клиента Email."""
     return SMTPClientManager()
 
+
 async def get_email_service(
-    client_manager: SMTPClientManager = Depends(get_smtp)
-    ) -> EmailService:
+    client_manager: SMTPClientManager = Depends(get_smtp),
+) -> EmailService:
     """Зависимость для получения EmailService."""
     return EmailServiceImpl(client_manager)
 

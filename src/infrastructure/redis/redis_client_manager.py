@@ -1,9 +1,8 @@
-from typing import Optional
-import redis.asyncio as aioredis
-from fastapi import FastAPI
-from src.config import settings
-
 import logging
+
+import redis.asyncio as aioredis
+
+from src.config import settings
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -46,7 +45,6 @@ class RedisClientManager:
             await self.__client.close()
             self.__client = None
             logger.info("Redis connection closed.")
-
 
     async def get_client(self) -> aioredis.Redis:
         """Возвращает клиент Redis из состояния приложения."""

@@ -1,6 +1,6 @@
-from typing import List, Optional
+from typing import Optional
 
-from sqlalchemy import select, or_
+from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession  # Используем асинхронную сессию
 
 from src.application.interfaces.user_repository import (
@@ -94,7 +94,6 @@ class UserRepositoryImpl(UserRepository):
             ValueError: Если не передан ни username, ни email.
 
         """
-
         if not username and not email:
             raise ValueError(
                 "Необходимо указать хотя бы один параметр: username или email"

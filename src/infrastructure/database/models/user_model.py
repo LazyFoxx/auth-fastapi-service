@@ -1,7 +1,6 @@
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped
 
 from src.infrastructure.database.database import Base, uniq_str_an
-from typing import Annotated
 
 
 class User(Base):

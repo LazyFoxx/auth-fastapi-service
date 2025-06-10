@@ -1,27 +1,23 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Response, Header
-from src.config import settings
 from typing import Annotated
+
+from fastapi import APIRouter, Header, HTTPException, Response, status
+
 # Импорты из Application (Сервис, Порт, Ошибки)
 from src.application.use_cases.user_service import (
-    UserService,
     DuplicateUserEmailError,
     DuplicateUserUsernameError,
 )
+from src.config import settings
 from src.domain.entities.user import User as DomainUser
 
 # Импорты из Infrastructure (Pydantic схемы, зависимости БД)
 from src.infrastructure.api.v1.schemas.users import (
     UserCreate,
-    UserBase,
 )
 from src.infrastructure.api.v1.schemas.verify_code import VerifyCode
-
 from src.infrastructure.dependencies import (
     UserServiceDep,
 )
-
-from src.config import settings
-
 
 router = APIRouter(
     prefix="/v1/auth",
@@ -37,7 +33,8 @@ async def register(
 ):
     """Первый этап регистрации.
     Принимает username password emai и отправляет код подтверждения на email.
-    Возвращает временный токен для идентификации в headers."""
+    Возвращает временный токен для идентификации в headers.
+    """
     try:
 
         domain_user = DomainUser(
@@ -59,31 +56,31 @@ async def register(
         )
 
 
-@router.post("/verify_code/")
-async def verify_code(
+@router.post("/register/verify/")
+async def register_verify_code(
     code: VerifyCode,
     response: Response,
     service: UserServiceDep,
-    authorization: Annotated[str, Header()]
+    authorization: Annotated[str, Header()],
 ):
     """Второй этап регистрации.
     Принимает код верификации и временнй токен (если он не истек)
-    и возвращает jwt токен доступа и рефреш токен если код совпадает"""
+    и возвращает jwt токен доступа и рефреш токен если код совпадает
+    """
     try:
 
         token = authorization.replace("Bearer ", "")
-        
-        
+
         access_token, refresh_token = await service.verify_code(code.code, token=token)
         response.headers["authorization"] = f"Bearer {access_token}"
-        
+
         response.set_cookie(
             key="refresh_token",
             value=refresh_token,
             httponly=True,
             secure=False,  # Для локальной разработки
-            samesite="lax", # Для локальной разработки
-            max_age=settings.token.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60
+            samesite="lax",  # Для локальной разработки
+            max_age=settings.token.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60,
         )
 
     except Exception as e:
@@ -91,3 +88,9 @@ async def verify_code(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
         )
+
+
+# @router.post("/login/")
+# @router.post("/logout/")
+# @router.post("/reset-password/")
+# @router.post("/verify-recovery/")

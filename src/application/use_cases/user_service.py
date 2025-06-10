@@ -1,16 +1,15 @@
-from typing import List
 import random
 
+from src.application.interfaces.email_service import EmailService
 from src.application.interfaces.password_hasher_repository import PasswordHasher
+from src.application.interfaces.token_service import TokenService
+from src.application.interfaces.user_cache_repository import UserCacheRepository
 from src.application.interfaces.user_repository import (
     UserRepository,
 )  # Зависит от интерфейса!
-from src.application.interfaces.user_cache_repository import UserCacheRepository
-from src.application.interfaces.token_service import TokenService
-from src.application.interfaces.email_service import EmailService
-
-from src.domain.entities.user import User as DomainUser
 from src.config import settings
+from src.domain.entities.user import User as DomainUser
+
 
 # Определяем кастомные ошибки для Application слоя
 class DuplicateUserEmailError(Exception):
@@ -90,35 +89,37 @@ class UserService:
         except Exception as e:
             print(e)
         return token
-    
+
     async def verify_code(self, code: str, token: str) -> str:
         try:
             user = await self._cache.get(token)
             print(user, token)
 
             if user is None:
-                raise ValueError('Токен недействителен')
-            
+                raise ValueError("Токен недействителен")
+
             if code != user.verification_code:
                 raise ValueError("Неверный код!")
-            
+
             # user = await self._create_user(user)
             await self._cache.delete(token)
-            
+
             jwt_payload = {"sub": user.id}
-            access_token = await self._token_service.create_access_token(data=jwt_payload)
-            refresh_token = await self._token_service.create_refresh_token(data=jwt_payload)
-            
-            await self._cache.save(refresh_token, user, ttl=24*60*60*settings.token.REFRESH_TOKEN_EXPIRE_DAYS)
-            
+            access_token = await self._token_service.create_access_token(
+                data=jwt_payload
+            )
+            refresh_token = await self._token_service.create_refresh_token(
+                data=jwt_payload
+            )
+
+            await self._cache.save(
+                refresh_token,
+                user,
+                ttl=24 * 60 * 60 * settings.token.REFRESH_TOKEN_EXPIRE_DAYS,
+            )
+
             return access_token, refresh_token
-        
-        
-        
-                
-                
-        
-        
+
         except Exception as e:
             print(e)
 

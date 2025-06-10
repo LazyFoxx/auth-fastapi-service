@@ -1,9 +1,9 @@
-from pydantic import BaseModel, EmailStr, Field, field_validator
+from pydantic import BaseModel, field_validator
 
 
 class VerifyCode(BaseModel):
     code: str
-    
+
     @field_validator("code")
     @classmethod
     def validate_code(cls, value: str) -> str:
@@ -11,5 +11,5 @@ class VerifyCode(BaseModel):
             raise ValueError("Код должен быть длинной в 6 символов")
         if not value.isdigit():
             raise ValueError("Код должен состоять только из цифрерных символов")
-        
+
         return value

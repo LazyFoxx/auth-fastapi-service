@@ -1,8 +1,8 @@
-from typing import Optional
-from aiosmtplib import SMTP, SMTPException
-from email.mime.text import MIMEText
-from pydantic import EmailStr
 import logging
+from typing import Optional
+
+from aiosmtplib import SMTP, SMTPException
+
 from src.config import settings
 
 logger = logging.getLogger(__name__)

@@ -1,20 +1,20 @@
 import os
 
-from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import Field, EmailStr, validator
-from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.backends import default_backend
-import base64
+from cryptography.hazmat.primitives import serialization
+from pydantic import EmailStr, Field, validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class JWTConfig(BaseSettings):
     """Настройки JWT"""
+
     ALGORITHM: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int
     REFRESH_TOKEN_EXPIRE_DAYS: int
     PUBLIC_KEY: str
     PRIVATE_KEY: str
-    
+
     @validator("PRIVATE_KEY")
     @classmethod
     def validate_private_key(cls, value: str, values: dict):
@@ -22,12 +22,11 @@ class JWTConfig(BaseSettings):
             return serialization.load_pem_private_key(
                 value.replace("\\n", "\n").encode("utf-8"),
                 password=None,
-                backend=default_backend()
+                backend=default_backend(),
             )
         except Exception as e:
             raise ValueError(f"Invalid private key: {str(e)}")
 
-    
 
 class SMTPConfig(BaseSettings):
     """Настройки SMTP сервера"""
@@ -40,6 +39,7 @@ class SMTPConfig(BaseSettings):
 
 class PostgresConfig(BaseSettings):
     """Настройки Postgress подключения"""
+
     user: str
     password: str
     host: str
@@ -49,7 +49,7 @@ class PostgresConfig(BaseSettings):
 
 class Settings(BaseSettings):
     """Настройки."""
-    
+
     token: JWTConfig = Field(default_factory=JWTConfig)
     psg: PostgresConfig = Field(default_factory=PostgresConfig)
     smtp: SMTPConfig = Field(default_factory=SMTPConfig)
