@@ -9,13 +9,13 @@ class TokenService(ABC):
         """генерирует уникальный токен по email."""
 
     @abstractmethod
-    async def create_access_token(self, data: dict) -> str:
+    async def create_access_token(self, data: dict[str, int | None]) -> str:
         """генерирует jwt access token."""
 
     @abstractmethod
-    async def create_refresh_token(self, data: dict) -> str:
+    async def create_refresh_token(self, data: dict[str, int | None]) -> str:
         """генерирует jwt refresh token."""
 
     @abstractmethod
-    async def verify_token(self, token: str) -> dict:
+    async def verify_token(self, token: str) -> dict[str, int]:
         """Декодирует jwt и возвращает payload."""

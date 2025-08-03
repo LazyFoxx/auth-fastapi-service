@@ -15,6 +15,8 @@ class UserRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_user(self, email, username) -> Optional[DomainUser]:
+    async def get_user(
+        self, username: Optional[str] = None, email: Optional[str] = None
+    ) -> Optional[DomainUser]:
         """Возвращает пользователя по email или username или None, если не найден."""
         pass

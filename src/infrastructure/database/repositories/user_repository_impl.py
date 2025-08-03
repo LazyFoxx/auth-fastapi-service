@@ -94,20 +94,24 @@ class UserRepositoryImpl(UserRepository):
             ValueError: Если не передан ни username, ни email.
 
         """
-        if not username and not email:
-            raise ValueError(
-                "Необходимо указать хотя бы один параметр: username или email"
-            )
+        try:
+            if not username and not email:
+                raise ValueError(
+                    "Необходимо указать хотя бы один параметр: username или email"
+                )
 
-        filters = []
-        if username:
-            filters.append(DBUser.username == username)
-        if email:
-            filters.append(DBUser.email == email)
+            filters = []
+            if username:
+                filters.append(DBUser.username == username)
+            if email:
+                filters.append(DBUser.email == email)
 
-        result = await self.db_session.execute(select(DBUser).filter(or_(*filters)))
+            result = await self.db_session.execute(select(DBUser).filter(or_(*filters)))
 
-        db_user = result.scalar_one_or_none()
-        if db_user is None:
+            db_user = result.scalar_one_or_none()
+            if db_user is None:
+                return None
+            return await self._to_domain(db_user)
+        except Exception as ex:
+            print("1", ex)
             return None
-        return await self._to_domain(db_user)

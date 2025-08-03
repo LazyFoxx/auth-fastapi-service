@@ -7,7 +7,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class JWTConfig(BaseSettings):
-    """Настройки JWT"""
+    """Настройки JWT."""
 
     ALGORITHM: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int
@@ -17,19 +17,22 @@ class JWTConfig(BaseSettings):
 
     @validator("PRIVATE_KEY")
     @classmethod
-    def validate_private_key(cls, value: str, values: dict):
+    def validate_private_key(cls, value: str) -> str:
+        """Проверка валидности приватного ключа."""
         try:
-            return serialization.load_pem_private_key(
+            serialization.load_pem_private_key(
                 value.replace("\\n", "\n").encode("utf-8"),
                 password=None,
                 backend=default_backend(),
             )
+
+            return value
         except Exception as e:
             raise ValueError(f"Invalid private key: {str(e)}")
 
 
 class SMTPConfig(BaseSettings):
-    """Настройки SMTP сервера"""
+    """Настройки SMTP сервера."""
 
     server: str = Field(min_length=1)
     port: int = Field(ge=1, le=65535)
@@ -38,7 +41,7 @@ class SMTPConfig(BaseSettings):
 
 
 class PostgresConfig(BaseSettings):
-    """Настройки Postgress подключения"""
+    """Настройки Postgress подключения."""
 
     user: str
     password: str
@@ -61,7 +64,7 @@ class Settings(BaseSettings):
         env_nested_delimiter="__",
     )
 
-    def get_db_url(self):
+    def get_db_url(self) -> str:
         """Формирует и возвращает ссылку для подключения к БД."""
         return (
             f"postgresql+asyncpg://{self.psg.user}:{self.psg.password}@"

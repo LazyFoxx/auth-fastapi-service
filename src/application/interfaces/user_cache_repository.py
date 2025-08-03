@@ -13,11 +13,11 @@ class UserCacheRepository(ABC):
         pass
 
     @abstractmethod
-    async def save(self, key: str, user: DomainUser, ttl: int):
+    async def save(self, key: str, user: DomainUser, ttl: int) -> Optional[DomainUser]:
         """Сохранить пользователя в кэше по ключу с указанным временем жизни (TTL)."""
         pass
 
     @abstractmethod
-    async def delete(self, key: str):
+    async def delete(self, key: str) -> Optional[bool]:
         """Удалить пользователя из кэша по ключу."""
         pass

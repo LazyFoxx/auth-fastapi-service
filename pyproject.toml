@@ -72,6 +72,7 @@ fix = true
 ignore = ["D100", "D104", "D105"]
 
 [tool.mypy]
+plugins = ["pydantic.mypy"]
 python_version = "3.13"
 strict = true
 ignore_missing_imports = true
